@@ -327,18 +327,97 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(err => { console.error('Failed to copy:', err); });
     };
 
-    const rsvpForm = document.getElementById('rsvpForm');
-    if (rsvpForm) {
-        rsvpForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const rsvpStatus = document.getElementById('rsvpStatus');
-            rsvpStatus.innerHTML = '<p style="color: var(--primary);">Mengirim data...</p>';
-            setTimeout(() => {
-                rsvpStatus.innerHTML = '<p style="color: #2e7d32;">Terima kasih! Konfirmasi kehadiran Anda telah terkirim.</p>';
-                rsvpForm.reset();
-            }, 1500);
-        });
+// ===== RSVP FORM =====
+const rsvpForm = document.getElementById("rsvpForm");
+
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzQB9JS_IRWOmaRO3ENR4E-e_rOEblq70vrMePT8tMp6aJopF6mg1FXVRmi47q4q7vY/exec";
+
+if (rsvpForm) {
+
+  rsvpForm.addEventListener("submit", async function (e) {
+
+    e.preventDefault();
+
+    const rsvpStatus =
+      document.getElementById("rsvpStatus");
+
+    const submitButton =
+      rsvpForm.querySelector(".btn-submit");
+
+    // Ambil data form
+    const name =
+      document.getElementById("rsvpName").value.trim();
+
+    const attendanceSelect =
+      document.getElementById("rsvpAttendance");
+
+    const attendance =
+      attendanceSelect.options[
+        attendanceSelect.selectedIndex
+      ].text;
+
+    const guests =
+      document.getElementById("rsvpGuests").value;
+
+    const message =
+      document.getElementById("rsvpMessage").value.trim();
+
+    // Data yang dikirim
+    const formData = {
+      name: name,
+      attendance: attendance,
+      guests: guests,
+      message: message
+    };
+
+    // Loading
+    rsvpStatus.innerHTML =
+      '<p style="color: var(--primary);">' +
+      'Mengirim data...' +
+      '</p>';
+
+    submitButton.disabled = true;
+    submitButton.style.opacity = "0.6";
+
+    try {
+
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      // Anggap request berhasil dikirim
+      rsvpStatus.innerHTML =
+        '<p style="color: #2e7d32;">' +
+        'Terima kasih! Konfirmasi kehadiran Anda telah terkirim.' +
+        '</p>';
+
+      rsvpForm.reset();
+
+    } catch (error) {
+
+      console.error("RSVP Error:", error);
+
+      rsvpStatus.innerHTML =
+        '<p style="color: #c62828;">' +
+        'Maaf, terjadi kesalahan saat mengirim data. Silakan coba lagi.' +
+        '</p>';
+
+    } finally {
+
+      submitButton.disabled = false;
+      submitButton.style.opacity = "1";
+
     }
+
+  });
+
+}
 
     const wishesForm = document.getElementById('wishesForm');
     if (wishesForm) {
