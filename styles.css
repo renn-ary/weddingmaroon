@@ -854,14 +854,14 @@ body {
     text-align: center;
 }
 
-.gift-text {
+.webpt-text {
     font-size: 14px;
     color: var(--white);
     margin-bottom: 20px;
     opacity: 0.9;
 }
 
-.gift-btn-container {
+.webpt-btn-container {
     display: flex;
     justify-content: center;
     width: 100%;
